@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "Chatify"
+version = "0.1.0"
+description = "A chating app based on PyQt5 Gui. It uses MongoDB as its Cloud Server"
+authors = ["Deep Basumatary <deepmusicofficial35@gmail.com>", "Abhishek Kashyap <abhik5567@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyQt5 = "^5.15.4"
+pymongo = "^3.12.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
