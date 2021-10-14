@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
         t = threading.Thread(target=self.new_msg_check)
         t.start()
 
+    #################################################################################################
     def signupUI(self):
         self.signup_bg = QtWidgets.QLabel(self)
         self.signup_bg.setGeometry(QtCore.QRect(10, 10, 351, 601))
@@ -66,6 +67,8 @@ class MainWindow(QMainWindow):
             self.remove_signupUI()
             credential = {'log_name': set_log_name, 'log_pass': set_log_pass}
             db_log.insert_one(credential)
+        self.remove_signupUI()
+        self.insert_loginUI()
 
     def remove_signupUI(self):
         self.signup_bg.setVisible(False)
@@ -253,7 +256,7 @@ class MainWindow(QMainWindow):
         self.new_msg = QtWidgets.QLineEdit(self)
         self.new_msg.setGeometry(120,15,150,30)
         self.new_msg.setReadOnly(True)
-        self.new_msg.setText('No new Messages')
+        self.new_msg.setText('No New Messages')
         self.new_msg.setStyleSheet("color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
 
     def new_msg_check(self):
@@ -261,7 +264,7 @@ class MainWindow(QMainWindow):
         while True:
             msg_check = db.estimated_document_count()
             if msg_check != new_m:
-                self.new_msg.setText('New Message... Click Refresh')
+                self.new_msg.setText('New Message... Click Refresh')               
             new_m = db.estimated_document_count()
 
     def refresh(self):
@@ -273,13 +276,13 @@ class MainWindow(QMainWindow):
         self.msg_box.setText('')
 
     def update_db(self):
+        self.new_msg.setText('No New Messages')
         username = self.username_login.text()
         text = self.text_box.text()
         msg = {'alias': username, 'message': text}
         db.insert_one(msg)
         self.update_op()
         self.text_box.clear()
-        self.new_msg.setText('No New Messages')
 
     def update_op(self):
         all = db.find({})
