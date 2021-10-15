@@ -4,10 +4,10 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit
 from PyQt5.QtCore import QSize
 import threading
 import sys
+import asyncio
+import keyboard
 
 
-
-"""init the MONGODB"""
 cluster = pymongo.MongoClient("mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = cluster['socialmedia']['messages']
 db_log = cluster['socialmedia'] ['log']
@@ -31,6 +31,9 @@ class MainWindow(QMainWindow):
         self.update_op()
         t = threading.Thread(target=self.new_msg_check)
         t.start()
+        loop = asyncio.get_event_loop()
+        while True:
+            loop.run_until_complete(show_message())
 
     
     def signupUI(self):
@@ -317,11 +320,12 @@ class MainWindow(QMainWindow):
         self.text_box.clear()
 
     
-    def update_op(self):
+    async def update_op(self):
         '''updates the messages in the screen'''
         all = db.find({})
         text_database = []
         msg_count = 0
+        asyncio.sleep(0.01)
         for messages in all:
             msg_count += 1
             user = messages['alias']
@@ -329,6 +333,12 @@ class MainWindow(QMainWindow):
             msg = f"[{user}] {text}"
             text_database.append(msg)
         self.msg_box.setText("\n".join(text_database))
+    
+    async def show_message(self):
+        await asyncio.sleep(0.1)
+        a = loop.create_task(update_op())
+        await asyncio.wait([a])
+
 
 
 
