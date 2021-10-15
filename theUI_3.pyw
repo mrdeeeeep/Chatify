@@ -18,6 +18,7 @@ db_log = cluster['socialmedia'] ['log']
 class MainWindow(QMainWindow):
 
     def __init__(self):
+        """Opens all necessary windows and buttons as needed """
         super(MainWindow, self).__init__()
         self.setMinimumSize(QSize(373, 624))
         self.setWindowTitle("CHATIFY")
@@ -31,8 +32,9 @@ class MainWindow(QMainWindow):
         t = threading.Thread(target=self.new_msg_check)
         t.start()
 
-    """UI FOR THE SIGN_UP SCREEN"""
+    
     def signupUI(self):
+        """UI FOR THE SIGN_UP SCREEN"""
         self.signup_bg = QtWidgets.QLabel(self)
         self.signup_bg.setGeometry(QtCore.QRect(10, 10, 351, 601))
         self.signup_bg.setStyleSheet("background-color: rgb(86, 86, 86);")
@@ -84,8 +86,9 @@ class MainWindow(QMainWindow):
         self.password_signup.setVisible(False)
         self.sign_up_btn.setVisible(False)
 
-    '''displays the SIGNUP UI'''
+
     def insert_signupUi(self):
+        '''displays the SIGNUP UI'''
         self.signup_bg.setVisible(True)
         self.username_signup.setVisible(True)
         self.password_signup.setVisible(True)
@@ -98,8 +101,9 @@ class MainWindow(QMainWindow):
 
 
 
-    '''UI FOR THE START UP SCREEN '''
+    
     def startupUI(self):
+        '''UI FOR THE START UP SCREEN '''
         self.startup_bg = QtWidgets.QLabel(self)
         self.startup_bg.setGeometry(QtCore.QRect(10, 10, 351, 601))
         self.startup_bg.setStyleSheet("background-color: rgb(86, 86, 86);")
@@ -125,15 +129,17 @@ class MainWindow(QMainWindow):
 
     '''FUNCTUONS FOR THE STARTUP SCREEN'''
 
-    '''takes to sign in screen'''
+
     def startup_sign_in_func(self):
+        '''takes to sign in screen'''
         self.startup_sign_up_button.setVisible(False)
         self.startup_sign_in_button.setVisible(False)
         self.startup_bg.setVisible(False)
         self.remove_signupUI()
 
-    ''' take to sign up screen'''
+
     def startup_sign_up_func(self):
+        ''' take to sign up screen'''
         self.startup_sign_up_button.setVisible(False)
         self.startup_sign_in_button.setVisible(False)
         self.startup_bg.setVisible(False)
@@ -143,13 +149,8 @@ class MainWindow(QMainWindow):
 
 
 
-
-
-
-
-
-    '''UI FOR THE LOGIN SCREEN'''
     def loginUI(self):
+        '''UI FOR THE LOGIN SCREEN'''
         self.login_bg = QtWidgets.QLabel(self)
         self.login_bg.setGeometry(QtCore.QRect(10, 10, 351, 601))
         self.login_bg.setStyleSheet("background-color: rgb(86, 86, 86);")
@@ -190,8 +191,9 @@ class MainWindow(QMainWindow):
 
     '''FUNCTIONS FOR THE LOGIN SCREEN'''
 
-    ''' logs in the user'''
+    
     def sign_in_func(self):
+        ''' logs in the user'''
         log_name = self.username_login.text()
         log_pass = self.password_login.text()
         current_user = db_log.find({})
@@ -206,16 +208,18 @@ class MainWindow(QMainWindow):
         elif authority == False:
             self.wrong_pass.setVisible(True)
 
-    '''removes the login ui'''
+    
     def remove_loginUI(self):
+        '''removes the login ui'''
         self.login_bg.setVisible(False)
         self.password_login.setVisible(False)
         self.username_login.setVisible(False)
         self.sign_in_btn.setVisible(False)
         self.wrong_pass.setVisible(False)
 
-    '''displays the login ui'''
+    
     def insert_loginUI(self):
+        '''displays the login ui'''
         self.login_bg.setVisible(True)
         self.password_login.setVisible(True)
         self.username_login.setVisible(True)
@@ -223,17 +227,9 @@ class MainWindow(QMainWindow):
 
 
 
-
-
-
-
-
-
-
-
-
-    ''' UI FOR THE MAIN SCREEN'''
+    
     def initUI(self):
+        ''' UI FOR THE MAIN SCREEN'''
 
         self.text_box = QtWidgets.QLineEdit(self)
         self.text_box.setGeometry(QtCore.QRect(30, 510, 261, 41))
@@ -287,8 +283,9 @@ class MainWindow(QMainWindow):
 
     '''FUNCTIONS FOR THE MAIN SCREEN'''
 
-    '''checks for new messages, and displays alert on the screen'''
+    
     def new_msg_check(self):
+        '''checks for new messages, and displays alert on the screen'''
         new_m = db.estimated_document_count()
         while True:
             msg_check = db.estimated_document_count()
@@ -296,18 +293,21 @@ class MainWindow(QMainWindow):
                 self.new_msg.setText('New Message... Click Refresh')
             new_m = db.estimated_document_count()
 
-    '''refresses new messages'''
+    
     def refresh(self):
+        '''refresses new messages'''
         self.new_msg.setText('No New Messages')
         self.update_op()
 
-    '''deletes all the messages'''
+    
     def delete_all(self):
+        '''deletes all the messages'''
         db.delete_many({})
         self.msg_box.setText('')
 
-    '''inserts the new text on the database'''
+    
     def update_db(self):
+        '''inserts the new text on the database'''
         self.new_msg.setText('No New Messages')
         username = self.username_login.text()
         text = self.text_box.text()
@@ -316,8 +316,9 @@ class MainWindow(QMainWindow):
         self.update_op()
         self.text_box.clear()
 
-    '''updates the messages in the screen'''
+    
     def update_op(self):
+        '''updates the messages in the screen'''
         all = db.find({})
         text_database = []
         msg_count = 0
