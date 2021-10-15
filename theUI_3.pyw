@@ -6,11 +6,14 @@ from PyQt5.QtCore import QSize
 import threading
 import sys
 import time
+import asyncio
+import keyboard
 
 
 cluster = pymongo.MongoClient("mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = cluster['socialmedia']['messages']
-db_log = cluster['socialmedia'] ['log']
+db_log = cluster['socialmedia']['log']
+
 
 class MainWindow(QMainWindow):
 
