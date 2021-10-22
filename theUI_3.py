@@ -7,10 +7,9 @@ import sys
 import asyncio
 import keyboard
 
-
-cluster = pymongo.MongoClient("mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+cluster = pymongo.MongoClient(host="mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = cluster['socialmedia']['messages']
-db_log = cluster['socialmedia'] ['log']
+db_log = cluster['socialmedia']['log']
 
 
 
@@ -27,13 +26,6 @@ class MainWindow(QMainWindow):
         self.signupUI()
         self.loginUI()
         self.startupUI()
-
-        self.update_op()
-        t = threading.Thread(target=self.new_msg_check)
-        t.start()
-        loop = asyncio.get_event_loop()
-        while True:
-            loop.run_until_complete(show_message())
 
     
     def signupUI(self):
@@ -71,8 +63,9 @@ class MainWindow(QMainWindow):
 
     '''FUNCTIONS FOR THE SIGN_UP SCREEN'''
 
-    '''create account '''
+    
     def sign_up_func(self):
+        '''create a user account'''
         set_log_name =  self.username_signup.text()
         set_log_pass =  self.password_signup.text()
         if set_log_name != '*username*':
@@ -82,8 +75,9 @@ class MainWindow(QMainWindow):
         self.remove_signupUI()
         self.insert_loginUI()
 
-    '''removes the SIGNUP ui'''
+    
     def remove_signupUI(self):
+        '''removes the SIGNUP ui'''
         self.signup_bg.setVisible(False)
         self.username_signup.setVisible(False)
         self.password_signup.setVisible(False)
@@ -97,14 +91,6 @@ class MainWindow(QMainWindow):
         self.password_signup.setVisible(True)
         self.sign_up_btn.setVisible(True)
 
-
-
-
-
-
-
-
-    
     def startupUI(self):
         '''UI FOR THE START UP SCREEN '''
         self.startup_bg = QtWidgets.QLabel(self)
@@ -138,6 +124,7 @@ class MainWindow(QMainWindow):
         self.startup_sign_up_button.setVisible(False)
         self.startup_sign_in_button.setVisible(False)
         self.startup_bg.setVisible(False)
+        #del(self.sign_up_ui)
         self.remove_signupUI()
 
 
@@ -199,16 +186,10 @@ class MainWindow(QMainWindow):
         ''' logs in the user'''
         log_name = self.username_login.text()
         log_pass = self.password_login.text()
-        current_user = db_log.find({})
-        authority = False
-        for log in current_user:
-            authorised_name = log['log_name']
-            authorised_pass = log['log_pass']
-            if log_name == authorised_name and log_pass == authorised_pass:
-                authority = True
-        if authority == True:
+        current_user = db_log.find({log_name: log_pass})
+        if current_user:
             self.remove_loginUI()
-        elif authority == False:
+        else:
             self.wrong_pass.setVisible(True)
 
     
@@ -284,23 +265,23 @@ class MainWindow(QMainWindow):
         self.new_msg.setText('No New Messages')
         self.new_msg.setStyleSheet("color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
 
+        t = threading.Thread(target=self.update_op)
+        t.start()
+
     '''FUNCTIONS FOR THE MAIN SCREEN'''
 
     
     def new_msg_check(self):
         '''checks for new messages, and displays alert on the screen'''
-        new_m = db.estimated_document_count()
-        while True:
-            msg_check = db.estimated_document_count()
-            if msg_check != new_m:
-                self.new_msg.setText('New Message... Click Refresh')
-            new_m = db.estimated_document_count()
+        print("123")
+        '''while True:
+            self.update_op()'''
 
     
     def refresh(self):
-        '''refresses new messages'''
+        '''refreshes new messages'''
+        #self.update_op()
         self.new_msg.setText('No New Messages')
-        self.update_op()
 
     
     def delete_all(self):
@@ -316,30 +297,24 @@ class MainWindow(QMainWindow):
         text = self.text_box.text()
         msg = {'alias': username, 'message': text}
         db.insert_one(msg)
-        self.update_op()
         self.text_box.clear()
 
     
-    async def update_op(self):
+    def update_op(self):
         '''updates the messages in the screen'''
-        all = db.find({})
-        text_database = []
-        msg_count = 0
-        asyncio.sleep(0.01)
-        for messages in all:
-            msg_count += 1
-            user = messages['alias']
-            text = messages['message']
-            msg = f"[{user}] {text}"
-            text_database.append(msg)
-        self.msg_box.setText("\n".join(text_database))
+        print(dir(self.msg_box))
+        while self.msg_box.isHidden:
+            pass
+        while True:
+            def get_messages():
+                """gets all the messages from the server """
+                for messages in db.find({}):
+                    yield f"[{messages['alias']}]: {messages['message']}"
+            #self.msg_box.setText("\n".join(list(get_messages())))
+            #print("lol")
+            #print("\n".join(get_messages()))
     
-    async def show_message(self):
-        await asyncio.sleep(0.1)
-        a = loop.create_task(update_op())
-        await asyncio.wait([a])
-
-
+    
 
 
 
