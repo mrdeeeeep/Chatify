@@ -2,12 +2,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import pymongo
 from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit
 from PyQt5.QtCore import QSize
-import threading
+from threading import Thread
 import sys
 import asyncio
-import keyboard
-from random import randint
-import multiprocessing as mp
 
 cluster = pymongo.MongoClient(
     host="mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
@@ -126,7 +123,6 @@ class MainWindow(QMainWindow):
         self.startup_sign_up_button.setVisible(False)
         self.startup_sign_in_button.setVisible(False)
         self.startup_bg.setVisible(False)
-        # del(self.sign_up_ui)
         self.remove_signupUI()
 
     def startup_sign_up_func(self):
@@ -267,9 +263,9 @@ class MainWindow(QMainWindow):
         self.new_msg.setStyleSheet(
             "color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
 
-        ctx = mp.get_context('spawn')
-        p = ctx.Process(target=self.update_op)
-        p.start()
+        
+        t = Thread(target=self.update_op)
+        t.start()
 
     '''FUNCTIONS FOR THE MAIN SCREEN'''
 
@@ -281,7 +277,6 @@ class MainWindow(QMainWindow):
 
     def refresh(self):
         '''refreshes new messages'''
-        # self.update_op()
         self.new_msg.setText('No New Messages')
 
         def get_messages() -> list:
@@ -307,7 +302,7 @@ class MainWindow(QMainWindow):
     def update_op(self):
         '''updates the messages in the screen'''
         while not self.opened:
-            print(str(randint(1, 10000)))
+            pass
         self.msg_box.setText(str(randint(1, 10000)))
         while True:
             def get_messages() -> list:
