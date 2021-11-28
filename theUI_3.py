@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         '''create a user account'''
         set_log_name = self.username_signup.text()
         set_log_pass = self.password_signup.text()
-        if set_log_name != '*username*':
+        if set_log_name != '*username*' and db_log.count_documents({'log_name': set_log_name}):
             self.remove_signupUI()
             credential = {'log_name': set_log_name, 'log_pass': set_log_pass}
             db_log.insert_one(credential)
@@ -222,7 +222,7 @@ class MainWindow(QMainWindow):
         font.setPointSize(11)
         self.send_btn.setFont(font)
         self.send_btn.setText("SEND")
-        self.send_btn.clicked.connect(self.update_db)
+        self.send_btn.clicked.connect(self.refresh)
         self.send_btn.setStyleSheet(
             "color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
 
@@ -271,9 +271,7 @@ class MainWindow(QMainWindow):
 
     def new_msg_check(self):
         '''checks for new messages, and displays alert on the screen'''
-        print("123")
-        '''while True:
-            self.update_op()'''
+        pass
 
     def refresh(self):
         '''refreshes new messages'''
@@ -303,15 +301,12 @@ class MainWindow(QMainWindow):
         '''updates the messages in the screen'''
         while not self.opened:
             pass
-        self.msg_box.setText(str(randint(1, 10000)))
         while True:
             def get_messages() -> list:
                 """gets all the messages from the server """
                 for messages in db.find({}):
                     yield f"[{messages['alias']}]: {messages['message']}"
             # self.msg_box.setText("\n".join(list(get_messages())))
-
-            # print("lol")
             # print("\n".join(get_messages()))
 
 
