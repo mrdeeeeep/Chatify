@@ -67,7 +67,6 @@ class MainWindow(QMainWindow):
         '''create a user account'''
         set_log_name = self.username_signup.text()
         set_log_pass = self.password_signup.text()
-        print(db_log.count_documents({'log_name': set_log_name}))
         if (set_log_name != '*username*') and (db_log.count_documents({'log_name': set_log_name}) <= 1):
             self.remove_signupUI()
             print("shit")
@@ -268,8 +267,11 @@ class MainWindow(QMainWindow):
         #t.start()
 
     '''FUNCTIONS FOR THE MAIN SCREEN'''
-    def send (self):
+    def send(self):
         '''sends new messages'''
+        if not self.text_box.text():
+            self.text_box.clear()
+            return
         self.new_msg.setText('No New Messages')
 
         self.update_db()
@@ -280,10 +282,18 @@ class MainWindow(QMainWindow):
                 yield f"[{messages['alias']}]: {messages['message']}"
 
         self.msg_box.setText("\n".join(get_messages()))
+        self.text_box.clear()
 
-    def new_msg_check(self):
-        '''checks for new messages, and displays alert on the screen'''
-        pass
+    async def new_msg_check(self):
+        '''checks for new messages, and displays it on the screen'''
+        while True:
+            db.watch([{'$match': {'operationType': 'insert'}}])
+            await asyncio.sleep(0.1)
+            def get_messages() -> list:
+                """gets all the messages from the server """
+                for messages in db.find({}):
+                    yield f"[{messages['alias']}]: {messages['message']}"
+            self.msg_box.setText("\n".join(get_messages()))
 
     def refresh(self):
         '''refreshes new messages'''
@@ -295,6 +305,8 @@ class MainWindow(QMainWindow):
                 yield f"[{messages['alias']}]: {messages['message']}"
 
         self.msg_box.setText("\n".join(get_messages()))
+        
+        self.text_box.clear()
 
     def delete_all(self):
         '''deletes all the messages'''
@@ -308,14 +320,13 @@ class MainWindow(QMainWindow):
         text = self.text_box.text()
         msg = {'alias': username, 'message': text}
         db.insert_one(msg)
-        self.text_box.clear()
 
         def get_messages() -> list:
             """gets all the messages from the server """
             for messages in db.find({}):
                 yield f"[{messages['alias']}]: {messages['message']}"
 
-        self.msg_box.setText("\n".join(list(get_messages())))
+        self.msg_box.setText("\n".join(get_messages()))
 
     def update_op(self):
         '''updates the messages in the screen'''
@@ -323,7 +334,12 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = MainWindow()
-    mainWin.show()
-    sys.exit(app.exec_())
+    async def main():
+        app = QtWidgets.QApplication(sys.argv)
+        mainWin = MainWindow()
+        mainWin.show()
+        task = asyncio.get_event_loop(mainWin.new_msg_check())
+
+        sys.exit(app.exec_())
+    
+    asyncio.run(main())
