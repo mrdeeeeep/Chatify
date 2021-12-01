@@ -25,6 +25,11 @@ class MainWindow(QMainWindow):
         self.signupUI()
         self.loginUI()
         self.startupUI()
+    
+    def get_messages(self) -> list:
+        """gets all the messages from the server """
+        for messages in db.find({}):
+            yield f"[{messages['alias']}]: {messages['message']}"
 
     def signupUI(self):
         """UI FOR THE SIGN_UP SCREEN"""
@@ -276,12 +281,9 @@ class MainWindow(QMainWindow):
 
         self.update_db()
 
-        def get_messages() -> list:
-            """gets all the messages from the server """
-            for messages in db.find({}):
-                yield f"[{messages['alias']}]: {messages['message']}"
+        
 
-        self.msg_box.setText("\n".join(get_messages()))
+        self.msg_box.setText("\n".join(self.get_messages()))
         self.text_box.clear()
 
     async def new_msg_check(self):
@@ -289,22 +291,13 @@ class MainWindow(QMainWindow):
         while True:
             db.watch([{'$match': {'operationType': 'insert'}}])
             await asyncio.sleep(0.1)
-            def get_messages() -> list:
-                """gets all the messages from the server """
-                for messages in db.find({}):
-                    yield f"[{messages['alias']}]: {messages['message']}"
-            self.msg_box.setText("\n".join(get_messages()))
+            self.msg_box.setText("\n".join(self.get_messages()))
 
     def refresh(self):
         '''refreshes new messages'''
         self.new_msg.setText('No New Messages')
 
-        def get_messages() -> list:
-            """gets all the messages from the server """
-            for messages in db.find({}):
-                yield f"[{messages['alias']}]: {messages['message']}"
-
-        self.msg_box.setText("\n".join(get_messages()))
+        self.msg_box.setText("\n".join(self.get_messages()))
         
         self.text_box.clear()
 
@@ -321,12 +314,7 @@ class MainWindow(QMainWindow):
         msg = {'alias': username, 'message': text}
         db.insert_one(msg)
 
-        def get_messages() -> list:
-            """gets all the messages from the server """
-            for messages in db.find({}):
-                yield f"[{messages['alias']}]: {messages['message']}"
-
-        self.msg_box.setText("\n".join(get_messages()))
+        self.msg_box.setText("\n".join(self.get_messages()))
 
     def update_op(self):
         '''updates the messages in the screen'''
