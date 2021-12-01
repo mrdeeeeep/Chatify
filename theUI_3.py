@@ -264,8 +264,8 @@ class MainWindow(QMainWindow):
         self.new_msg.setStyleSheet(
             "color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
 
-        t = Thread(target=self.update_op)
-        t.start()
+        #t = Thread(target=self.update_op)
+        #t.start()
 
     '''FUNCTIONS FOR THE MAIN SCREEN'''
 
