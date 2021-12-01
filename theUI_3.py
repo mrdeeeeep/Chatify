@@ -68,12 +68,14 @@ class MainWindow(QMainWindow):
         '''create a user account'''
         set_log_name = self.username_signup.text()
         set_log_pass = self.password_signup.text()
-        if set_log_name != '*username*' and db_log.count_documents({'log_name': set_log_name}):
+        print(db_log.count_documents({'log_name': set_log_name}))
+        if (set_log_name != '*username*') and (db_log.count_documents({'log_name': set_log_name})<=1):
             self.remove_signupUI()
+            print("shit")
             credential = {'log_name': set_log_name, 'log_pass': set_log_pass}
             db_log.insert_one(credential)
-        self.remove_signupUI()
-        self.insert_loginUI()
+        #self.remove_signupUI()
+        #self.insert_loginUI()
 
     def remove_signupUI(self):
         '''removes the SIGNUP ui'''
@@ -296,18 +298,16 @@ class MainWindow(QMainWindow):
         msg = {'alias': username, 'message': text}
         db.insert_one(msg)
         self.text_box.clear()
+        def get_messages() -> list:
+            """gets all the messages from the server """
+            for messages in db.find({}):
+                yield f"[{messages['alias']}]: {messages['message']}"
+        self.msg_box.setText("\n".join(list(get_messages())))
+        
 
     def update_op(self):
         '''updates the messages in the screen'''
-        while not self.opened:
-            pass
-        while True:
-            def get_messages() -> list:
-                """gets all the messages from the server """
-                for messages in db.find({}):
-                    yield f"[{messages['alias']}]: {messages['message']}"
-            # self.msg_box.setText("\n".join(list(get_messages())))
-            # print("\n".join(get_messages()))
+        pass
 
 
 if __name__ == "__main__":
