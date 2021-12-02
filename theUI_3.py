@@ -216,7 +216,7 @@ class MainWindow(QMainWindow):
         self.text_box.setFont(font)
         self.text_box.setStyleSheet(
             "color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
-        self.text_box.returnPressed.connect(self.update_db)
+        self.text_box.returnPressed.connect(self.send)
 
         self.send_btn = QtWidgets.QPushButton(self)
         self.send_btn.setGeometry(QtCore.QRect(290, 510, 51, 41))
@@ -309,7 +309,6 @@ class MainWindow(QMainWindow):
         msg = {'alias': username, 'message': text}
         db.insert_one(msg)
 
-        self.msg_box.setText("\n".join(self.get_messages()))
 
     def update_op(self):
         '''updates the messages in the screen'''
