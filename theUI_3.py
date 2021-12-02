@@ -72,13 +72,11 @@ class MainWindow(QMainWindow):
         '''create a user account'''
         set_log_name = self.username_signup.text()
         set_log_pass = self.password_signup.text()
-        if (set_log_name != '*username*') and (db_log.count_documents({'log_name': set_log_name}) <= 1):
+        if (set_log_name != '*username*') and (db_log.count_documents({'log_name': set_log_name}) ==0):
             self.remove_signupUI()
-            print("shit")
             credential = {'log_name': set_log_name, 'log_pass': set_log_pass}
             db_log.insert_one(credential)
-        # self.remove_signupUI()
-        # self.insert_loginUI()
+            self.insert_loginUI()
 
     def remove_signupUI(self):
         '''removes the SIGNUP ui'''
