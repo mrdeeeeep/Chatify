@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         self.signupUI()
         self.loginUI()
         self.startupUI()
-    
+
     def get_messages(self) -> list:
         """gets all the messages from the server """
         for messages in db.find({}):
@@ -185,9 +185,8 @@ class MainWindow(QMainWindow):
 
     def sign_in_func(self):
         ''' logs in the user'''
-        log_name = self.username_login.text()
-        log_pass = self.password_login.text()
-        current_user = db_log.find({log_name: log_pass})
+        current_user = db_log.find_one(
+            {'log_name': self.username_login.text(), 'log_pass': self.password_login.text()})
         if current_user:
             self.remove_loginUI()
         else:
@@ -269,9 +268,10 @@ class MainWindow(QMainWindow):
             "color:rgb(255, 255, 255); background-color: rgb(100, 100, 100)")
 
         #t = Thread(target=self.update_op)
-        #t.start()
+        # t.start()
 
     '''FUNCTIONS FOR THE MAIN SCREEN'''
+
     def send(self):
         '''sends new messages'''
         if not self.text_box.text():
@@ -281,24 +281,21 @@ class MainWindow(QMainWindow):
 
         self.update_db()
 
-        
-
         self.msg_box.setText("\n".join(self.get_messages()))
         self.text_box.clear()
 
     async def new_msg_check(self):
         '''checks for new messages, and displays it on the screen'''
-        while True:
-            db.watch([{'$match': {'operationType': 'insert'}}])
-            await asyncio.sleep(0.1)
-            self.msg_box.setText("\n".join(self.get_messages()))
+        db.watch([{'$match': {'operationType': 'insert'}}])
+        self.msg_box.setText("\n".join(self.get_messages()))
+        await asyncio.sleep(1)
 
     def refresh(self):
         '''refreshes new messages'''
         self.new_msg.setText('No New Messages')
 
         self.msg_box.setText("\n".join(self.get_messages()))
-        
+
         self.text_box.clear()
 
     def delete_all(self):
@@ -326,8 +323,9 @@ if __name__ == "__main__":
         app = QtWidgets.QApplication(sys.argv)
         mainWin = MainWindow()
         mainWin.show()
-        task = asyncio.get_event_loop(mainWin.new_msg_check())
-
+        # while True:
+        task = asyncio.create_task(mainWin.new_msg_check())
+        await asyncio.sleep(0.1)
         sys.exit(app.exec_())
-    
+
     asyncio.run(main())
