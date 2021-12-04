@@ -11,6 +11,8 @@ cluster = pymongo.MongoClient(
 db = cluster['socialmedia']['messages']
 db_log = cluster['socialmedia']['log']
 
+#JUST LEARNING GIT
+
 
 class MainWindow(QMainWindow):
     opened = False
