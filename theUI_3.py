@@ -1,17 +1,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pymongo
 from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QThread
 from threading import Thread
 import sys
-import asyncio
 
 cluster = pymongo.MongoClient(
     host="mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = cluster['socialmedia']['messages']
 db_log = cluster['socialmedia']['log']
 
-#JUST LEARNING GIT
 
 
 class MainWindow(QMainWindow):
@@ -27,6 +25,9 @@ class MainWindow(QMainWindow):
         self.signupUI()
         self.loginUI()
         self.startupUI()
+        
+        #self.task = QThread().started.connect(self.new_msg_check())
+        #self.task.start()
 
     def get_messages(self) -> list:
         """gets all the messages from the server """
@@ -189,6 +190,7 @@ class MainWindow(QMainWindow):
             {'log_name': self.username_login.text(), 'log_pass': self.password_login.text()})
         if current_user:
             self.remove_loginUI()
+            self.msg_box.setText("\n".join(self.get_messages()))
         else:
             self.wrong_pass.setVisible(True)
 
@@ -284,11 +286,11 @@ class MainWindow(QMainWindow):
         self.msg_box.setText("\n".join(self.get_messages()))
         self.text_box.clear()
 
-    async def new_msg_check(self):
+    def new_msg_check(self):
         '''checks for new messages, and displays it on the screen'''
-        db.watch([{'$match': {'operationType': 'insert'}}])
-        self.msg_box.setText("\n".join(self.get_messages()))
-        await asyncio.sleep(1)
+        while True:
+            db.watch([{'$match': {'operationType': 'insert'}}])
+            self.msg_box.setText("\n".join(self.get_messages()))
 
     def refresh(self):
         '''refreshes new messages'''
@@ -318,13 +320,10 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    async def main():
+    def main():
         app = QtWidgets.QApplication(sys.argv)
         mainWin = MainWindow()
         mainWin.show()
-        # while True:
-        task = asyncio.create_task(mainWin.new_msg_check())
-        await asyncio.sleep(0.1)
         sys.exit(app.exec_())
 
-    asyncio.run(main())
+    main()
