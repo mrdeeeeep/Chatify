@@ -6,7 +6,7 @@ from threading import Thread
 import sys
 
 cluster = pymongo.MongoClient(
-    host="mongodb+srv://deep:1234abcd@cluster.ds3cv.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    host="")
 db = cluster['socialmedia']['messages']
 db_log = cluster['socialmedia']['log']
 
