@@ -4,4 +4,4 @@
 
 ## Authors
 
-> [mrdeeeeep](https://github.com/mrdeeeeep) & [Abhishek](https:github.com/Abhishek10351)
+> [mrdeeeeep](https://github.com/mrdeeeeep) & [Abhishek](https://github.com/Abhishek10351)
